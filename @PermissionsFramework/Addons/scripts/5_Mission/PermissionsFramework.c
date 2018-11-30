@@ -1,9 +1,12 @@
 class PermissionsFramework
 {
+    protected ref array< Man > m_ServerPlayers;
+
     protected bool m_bLoaded;
 
     void PermissionsFramework()
     {
+        m_ServerPlayers = new ref array< Man >;
         m_bLoaded = false;
 
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayers", this, SingeplayerExecutionType.Server );
@@ -14,6 +17,8 @@ class PermissionsFramework
     void ~PermissionsFramework()
     {
         Print("PermissionsFramework::~PermissionsFramework");
+        
+        GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).Remove( this.ReloadPlayerList );
     }
     
     void OnStart()
@@ -26,6 +31,7 @@ class PermissionsFramework
 
     void OnLoaded()
     {
+        GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
     }
 
     void Update( float timeslice )
@@ -42,6 +48,29 @@ class PermissionsFramework
     void OnUpdate( float timeslice )
     {
 
+    }
+
+    void ReloadPlayerList()
+    {
+        if ( GetGame().IsClient() ) return;
+
+        m_ServerPlayers.Clear();
+
+        GetGame().GetPlayers( m_ServerPlayers );
+
+        for ( int i = 0; i < m_ServerPlayers.Count(); i++ )
+        {
+            PlayerBase player = PlayerBase.Cast( m_ServerPlayers[i] );
+
+            ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( player.GetIdentity() );
+
+            player.authenticatedPlayer = auPlayer;
+
+            auPlayer.PlayerObject = player;
+            auPlayer.IdentityPlayer = player.GetIdentity();
+
+            auPlayer.UpdatePlayerData();
+        }
     }
 
     void UpdatePlayers( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
