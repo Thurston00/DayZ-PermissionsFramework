@@ -1,3 +1,5 @@
+const string PERMISSION_FRAMEWORK_DIRECTORY = "$profile:PermissionsFramework\\";
+
 class PermissionManager
 {
     ref array< ref AuthPlayer > AuthPlayers;
@@ -8,7 +10,7 @@ class PermissionManager
     {
         AuthPlayers = new ref array< ref AuthPlayer >;
 
-        RootPermission = new ref Permission( "ROOT", NULL );
+        RootPermission = new ref Permission( "ROOT" );
     }
 
     array< ref AuthPlayer > GetPlayers( ref array< string > guids = NULL )
@@ -121,7 +123,7 @@ class PermissionManager
         auPlayer.CopyPermissions( RootPermission );
 
         auPlayer.Load();
-        
+
         AuthPlayers.Insert( auPlayer );
 
         return auPlayer;

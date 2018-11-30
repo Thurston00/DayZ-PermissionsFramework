@@ -1,6 +1,6 @@
 class AuthPlayer
 {
-    const string AUTH_DIRECTORY = ROOT_COT_DIR + "Players\\";
+    const string AUTH_DIRECTORY = PERMISSION_FRAMEWORK_DIRECTORY + "Players\\";
     const string FILE_TYPE = "";
 
     ref Permission RootPermission;
@@ -21,7 +21,7 @@ class AuthPlayer
             Data = new ref PlayerData;
         }
 
-        RootPermission = new ref Permission( Data.SGUID, NULL );
+        RootPermission = new ref Permission( Data.SGUID );
 
         if ( GetGame().IsServer() )
         {

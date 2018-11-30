@@ -6,7 +6,13 @@ class PermissionsFramework
 
     void PermissionsFramework()
     {
-        m_ServerPlayers = new ref array< Man >;
+        MakeDirectory( PERMISSION_FRAMEWORK_DIRECTORY );
+
+        if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+        {
+            m_ServerPlayers = new ref array< Man >;
+        }
+
         m_bLoaded = false;
 
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayers", this, SingeplayerExecutionType.Server );
@@ -17,8 +23,13 @@ class PermissionsFramework
     void ~PermissionsFramework()
     {
         Print("PermissionsFramework::~PermissionsFramework");
-        
-        GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).Remove( this.ReloadPlayerList );
+
+        if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+        {
+            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).Remove( this.ReloadPlayerList );
+
+            delete m_ServerPlayers;
+        }
     }
     
     void OnStart()
@@ -31,7 +42,10 @@ class PermissionsFramework
 
     void OnLoaded()
     {
-        GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
+        if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+        {
+            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
+        }
     }
 
     void Update( float timeslice )
@@ -52,8 +66,6 @@ class PermissionsFramework
 
     void ReloadPlayerList()
     {
-        if ( GetGame().IsClient() ) return;
-
         m_ServerPlayers.Clear();
 
         GetGame().GetPlayers( m_ServerPlayers );
