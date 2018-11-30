@@ -4,11 +4,12 @@ modded class MissionServer
 
     void MissionServer()
     {        
-        m_PermissionsFramework = new PermissionsFramework();
+        m_PermissionsFramework = new ref PermissionsFramework;
     }
 
     void ~MissionServer()
     {
+        delete m_PermissionsFramework;
     }
 
     override void OnInit()

@@ -66,23 +66,27 @@ class PermissionsFramework
 
     void ReloadPlayerList()
     {
-        m_ServerPlayers.Clear();
-
         GetGame().GetPlayers( m_ServerPlayers );
 
         for ( int i = 0; i < m_ServerPlayers.Count(); i++ )
         {
-            PlayerBase player = PlayerBase.Cast( m_ServerPlayers[i] );
+            Man man = m_ServerPlayers[i];
+            PlayerBase player = PlayerBase.Cast( man );
 
-            ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( player.GetIdentity() );
+            ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( man.GetIdentity() );
 
-            player.authenticatedPlayer = auPlayer;
+            if ( player )
+            {
+                player.authenticatedPlayer = auPlayer;
+            }
 
             auPlayer.PlayerObject = player;
-            auPlayer.IdentityPlayer = player.GetIdentity();
+            auPlayer.IdentityPlayer = man.GetIdentity();
 
             auPlayer.UpdatePlayerData();
         }
+
+        m_ServerPlayers.Clear();
     }
 
     void UpdatePlayers( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )

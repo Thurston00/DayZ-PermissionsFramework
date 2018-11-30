@@ -4,11 +4,12 @@ modded class MissionGameplay
 
     void MissionGameplay()
     {        
-        m_PermissionsFramework = new PermissionsFramework();
+        m_PermissionsFramework = new ref PermissionsFramework;
     }
 
     void ~MissionGameplay()
     {
+        delete m_PermissionsFramework;
     }
 
     override void OnInit()

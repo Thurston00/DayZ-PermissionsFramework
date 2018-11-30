@@ -115,10 +115,7 @@ class PermissionManager
 
         ref AuthPlayer auPlayer = new ref AuthPlayer( data );
 
-        if ( player )
-        {
-            auPlayer.SetIdentity( player );
-        }
+        auPlayer.IdentityPlayer = player;
 
         auPlayer.CopyPermissions( RootPermission );
 

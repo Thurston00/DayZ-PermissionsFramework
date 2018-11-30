@@ -34,13 +34,6 @@ class AuthPlayer
         delete RootPermission;
     }
 
-    void SetIdentity( PlayerIdentity identity )
-    {
-        IdentityPlayer = identity;
-
-        Data.SSteam64ID = IdentityPlayer.GetPlainId();
-    }
-
     void SwapData( ref PlayerData newData )
     {
         Data = newData;
@@ -54,12 +47,6 @@ class AuthPlayer
     string GetName()
     {
         return Data.SName;
-    }
-
-    void SetPlayerObjects( ref PlayerBase obj, ref PlayerIdentity identity )
-    {
-        IdentityPlayer = identity;
-        PlayerObject = obj;
     }
 
     void UpdatePlayerData()

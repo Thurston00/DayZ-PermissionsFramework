@@ -44,7 +44,7 @@ class PlayerData
         APermissions = new ref array< string >;
     }
 
-    static void Load( ref PlayerData data, PlayerBase player )
+    static void Load( out PlayerData data, PlayerBase player )
     {
         if ( player == NULL ) return;
 
