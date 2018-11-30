@@ -1,0 +1,11 @@
+{
+    "discord.enabled": false,
+    "triggerTaskOnSave.on": true,
+    "triggerTaskOnSave.tasks": {
+        "Deploy": [
+            "**/*.c",
+            "**/*.layout",
+            "**/*.cpp"
+        ]
+    }
+}
