@@ -44,10 +44,8 @@ class PlayerData
         APermissions = new ref array< string >;
     }
 
-    static void Load( out PlayerData data, PlayerBase player )
+    static void Load( out PlayerData data, ref PlayerBase player )
     {
-        if ( player == NULL ) return;
-
         data.VPosition = player.GetPosition();
         data.VDirection = player.GetDirection();
         data.VOrientation = player.GetOrientation();
