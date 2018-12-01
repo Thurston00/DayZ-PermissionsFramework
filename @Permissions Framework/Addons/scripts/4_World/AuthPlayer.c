@@ -51,7 +51,6 @@ class AuthPlayer
 
     void UpdatePlayerData()
     {
-        Print( "Fail 1" );
         if ( IdentityPlayer == NULL ) return;
 
         Data.IPingMin = IdentityPlayer.GetPingMin();
@@ -61,11 +60,9 @@ class AuthPlayer
         Data.SSteam64ID = IdentityPlayer.GetPlainId();
         Data.SGUID = IdentityPlayer.GetId();
         Data.SName = IdentityPlayer.GetName();
-        Print( "Fail 2" );
 
         if ( PlayerObject == NULL ) return;
 
-        Print( "Fail 3" );
         PlayerData.Load( Data, PlayerObject );
     }
 

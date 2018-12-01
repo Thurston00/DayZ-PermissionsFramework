@@ -66,8 +66,6 @@ class PermissionsFramework
 
     void ReloadPlayerList()
     {
-        Print( "PermissionsFramework::ReloadPlayerList" );
-        
         GetGame().GetPlayers( m_ServerPlayers );
 
         for ( int i = 0; i < m_ServerPlayers.Count(); i++ )
