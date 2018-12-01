@@ -17,7 +17,7 @@
             },
             "command": "deploy.bat",
             "args": [
-                "C:\\Games\\steamapps\\common\\DayZ", "C:\\Games\\steamapps\\common\\DayZServer", "@PermissionsFramework"
+                "C:\\Games\\steamapps\\common\\DayZ", "C:\\Games\\steamapps\\common\\DayZServer", "@Permissions Framework"
             ],
             "problemMatcher": []
         },
@@ -35,7 +35,7 @@
             },
             "command": "launch.bat",
             "args": [
-                "C:\\Games\\steamapps\\common\\DayZ", "C:\\Games\\steamapps\\common\\DayZServer", "@PermissionsFramework"
+                "C:\\Games\\steamapps\\common\\DayZ", "C:\\Games\\steamapps\\common\\DayZServer", "@Permissions Framework"
             ],
             "problemMatcher": []
         }
