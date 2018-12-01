@@ -34,6 +34,10 @@ class PermissionsFramework
     
     void OnStart()
     {
+        if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+        {
+            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
+        }
     }
 
     void OnFinish()
@@ -42,10 +46,6 @@ class PermissionsFramework
 
     void OnLoaded()
     {
-        if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
-        {
-            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
-        }
     }
 
     void Update( float timeslice )
@@ -66,6 +66,8 @@ class PermissionsFramework
 
     void ReloadPlayerList()
     {
+        Print( "PermissionsFramework::ReloadPlayerList" );
+        
         GetGame().GetPlayers( m_ServerPlayers );
 
         for ( int i = 0; i < m_ServerPlayers.Count(); i++ )
