@@ -27,8 +27,6 @@ modded class MissionGameplay
         super.OnMissionStart();
     
         m_PermissionsFramework.OnStart();
-        
-        GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
     }
 
     override void OnMissionFinish()

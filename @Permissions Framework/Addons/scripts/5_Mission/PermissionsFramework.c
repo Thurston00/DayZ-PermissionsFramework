@@ -46,6 +46,10 @@ class PermissionsFramework
 
     void OnLoaded()
     {
+        if ( GetGame().IsClient() )
+        {
+            GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
+        }
     }
 
     void Update( float timeslice )
@@ -126,7 +130,15 @@ class PermissionsFramework
                 ref Param1< ref PlayerData > data;
                 if ( !ctx.Read( data ) ) return;
 
-                DeserializePlayer( data.param1 );
+                ref AuthPlayer auPlayer = DeserializePlayer( data.param1 );
+
+                if ( ClientAuthPlayer == NULL && GetGame().IsClient() )
+                {
+                    if ( auPlayer.GetGUID() == GetGame().GetPlayer().GetIdentity().GetId() )
+                    {
+                        ClientAuthPlayer = auPlayer;
+                    }
+                }
             }
         }
     }

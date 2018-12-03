@@ -123,6 +123,8 @@ class PermissionManager
 
         AuthPlayers.Insert( auPlayer );
 
+        // GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true, player );
+
         return auPlayer;
     }
 
@@ -205,7 +207,7 @@ class PermissionManager
             auPlayer = PlayerJoined( ident );
         }
 
-        return auPlayer
+        return auPlayer;
     }
 
     ref AuthPlayer GetPlayer( ref PlayerData data )
