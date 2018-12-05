@@ -42,6 +42,6 @@ modded class MissionGameplay
     {
         super.OnUpdate( timeslice );
 
-        m_PermissionsFramework.OnUpdate( timeslice );
+        m_PermissionsFramework.Update( timeslice );
     }
 }

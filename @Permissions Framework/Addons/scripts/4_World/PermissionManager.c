@@ -82,6 +82,7 @@ class PermissionManager
         {
             if ( ClientAuthPlayer == NULL )
             {
+                Print( "ClientAuth is NULL!" );
                 return true;
             }
 
@@ -123,8 +124,6 @@ class PermissionManager
 
         AuthPlayers.Insert( auPlayer );
 
-        // GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true, player );
-
         return auPlayer;
     }
 
@@ -140,10 +139,7 @@ class PermissionManager
             {
                 auPlayer.Save();
 
-                if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
-                {
-                    GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
-                }
+                GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
 
                 AuthPlayers.Remove( i );
                 break;

@@ -18,6 +18,7 @@ class PermissionsFramework
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayers", this, SingeplayerExecutionType.Server );
         GetRPCManager().AddRPC( "PermissionsFramework", "RemovePlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayer", this, SingeplayerExecutionType.Client );
+        GetRPCManager().AddRPC( "PermissionsFramework", "SetClientPlayer", this, SingeplayerExecutionType.Client );
     }
 
     void ~PermissionsFramework()
@@ -46,10 +47,8 @@ class PermissionsFramework
 
     void OnLoaded()
     {
-        if ( GetGame().IsClient() )
-        {
-            GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
-        }
+        Print( "Requesting player list!" );
+        GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
     }
 
     void Update( float timeslice )
@@ -101,7 +100,7 @@ class PermissionsFramework
             {
                 for ( int i = 0; i < GetPermissionsManager().GetPlayers().Count(); i++ )
                 {
-                    GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayer", new Param1< ref PlayerData >( SerializePlayer( GetPermissionsManager().GetPlayers().Get( i ) ) ), true, sender );
+                    GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayer", new Param1< ref PlayerData >( SerializePlayer( GetPermissionsManager().GetPlayers()[i] ) ), true, sender );
                 }
             }
         }
@@ -130,15 +129,21 @@ class PermissionsFramework
                 ref Param1< ref PlayerData > data;
                 if ( !ctx.Read( data ) ) return;
 
-                ref AuthPlayer auPlayer = DeserializePlayer( data.param1 );
+                DeserializePlayer( data.param1 );
+            }
+        }
+    }
 
-                if ( ClientAuthPlayer == NULL && GetGame().IsClient() )
-                {
-                    if ( auPlayer.GetGUID() == GetGame().GetPlayer().GetIdentity().GetId() )
-                    {
-                        ClientAuthPlayer = auPlayer;
-                    }
-                }
+    void SetClientPlayer( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
+    {
+        if ( type == CallType.Client )
+        {
+            if ( GetGame().IsMultiplayer() )
+            {
+                ref Param1< ref PlayerData > data;
+                if ( !ctx.Read( data ) ) return;
+
+                ClientAuthPlayer = DeserializePlayer( data.param1 );
             }
         }
     }

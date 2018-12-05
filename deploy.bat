@@ -4,7 +4,6 @@ set workspaceDir=%cd%
 set gameDir=%~1
 set serverDir=%~2
 set modName=%~3
-set missionName=%~4
 
 set tempFolder=%workspaceDir%\BIN
 

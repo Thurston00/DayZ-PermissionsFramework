@@ -35,7 +35,7 @@ modded class MissionServer
     {
         super.OnUpdate( timeslice );
 
-        m_PermissionsFramework.OnUpdate( timeslice );
+        m_PermissionsFramework.Update( timeslice );
     }
 
 	override void OnPreloadEvent(PlayerIdentity identity, out bool useDB, out vector pos, out float yaw, out int queueTime)
@@ -48,8 +48,8 @@ modded class MissionServer
     override void InvokeOnConnect( PlayerBase player, PlayerIdentity identity)
 	{
         super.InvokeOnConnect( player, identity );
-
-        GetPermissionsManager().GetPlayerByIdentity( identity );
+        
+        GetRPCManager().SendRPC( "PermissionsFramework", "SetClientPlayer", new Param1< ref PlayerData >( SerializePlayer( GetPermissionsManager().GetPlayerByIdentity( identity ) ) ), true, identity );
 
         GetGame().SelectPlayer( identity, player );
     } 
