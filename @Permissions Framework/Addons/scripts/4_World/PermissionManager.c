@@ -13,20 +13,20 @@ class PermissionManager
         RootPermission = new ref Permission( "ROOT" );
     }
 
-    array< ref AuthPlayer > GetPlayers( ref array< string > guids = NULL )
+    array< ref AuthPlayer > GetPlayers( ref array< string > steamIds = NULL )
     {
-        if ( guids == NULL )
+        if ( steamIds == NULL )
         {
             return AuthPlayers;
         }
 
         array< ref AuthPlayer > tempArray = new array< ref AuthPlayer >;
 
-        for ( int i = 0; i < guids.Count(); i++ )
+        for ( int i = 0; i < steamIds.Count(); i++ )
         {
             for ( int k = 0; k < AuthPlayers.Count(); k++ )
             {
-                if ( guids[i] == AuthPlayers[k].GetGUID() )
+                if ( steamIds[i] == AuthPlayers[k].GetSteam64ID() )
                 {
                     tempArray.Insert( AuthPlayers[k] );
                 }
@@ -108,10 +108,12 @@ class PermissionManager
         {
             data.SName = player.GetName();
             data.SGUID = player.GetId();
+            data.SSteam64ID = player.GetPlainId();
         } else 
         {
             data.SName = "Offline Mode";
             data.SGUID = "N/A";
+            data.SSteam64ID = "N/A";
         }
 
         ref AuthPlayer auPlayer = new ref AuthPlayer( data );
@@ -174,6 +176,33 @@ class PermissionManager
             ref PlayerData data = new ref PlayerData;
             
             data.SGUID = guid;
+
+            auPlayer = new ref AuthPlayer( data );
+
+            AuthPlayers.Insert( auPlayer );
+        }
+
+        return auPlayer;
+    }
+
+    ref AuthPlayer GetPlayerBySteam64ID( string steam64 )
+    {
+        ref AuthPlayer auPlayer = NULL;
+
+        for ( int i = 0; i < AuthPlayers.Count(); i++ )
+        {
+            if ( AuthPlayers[i].GetSteam64ID() == steam64 )
+            {
+                auPlayer = AuthPlayers[i];
+                break;
+            }
+        }
+
+        if ( auPlayer == NULL )
+        {
+            ref PlayerData data = new ref PlayerData;
+            
+            data.SSteam64ID = steam64;
 
             auPlayer = new ref AuthPlayer( data );
 

@@ -76,19 +76,19 @@ array< ref AuthPlayer > DeserializePlayers( ref array< ref PlayerData > players 
     return output;
 }
 
-ref array< string > SerializePlayersGUID( array< ref AuthPlayer > players )
+ref array< string > SerializePlayersID( array< ref AuthPlayer > players )
 {
     ref array< string > output = new ref array< string >;
 
     for ( int i = 0; i < players.Count(); i++)
     {
-        output.Insert( players[i].GetGUID() );
+        output.Insert( players[i].GetSteam64ID() );
     }
 
     return output;
 }
 
-array< ref AuthPlayer > DeserializePlayersGUID( ref array< string > guids )
+array< ref AuthPlayer > DeserializePlayersID( ref array< string > steam64Ids )
 {
-    return GetPermissionsManager().GetPlayers( guids );
+    return GetPermissionsManager().GetPlayers( steam64Ids );
 }
