@@ -32,6 +32,7 @@ class AuthPlayer
         if ( GetGame().IsServer() )
         {
             MakeDirectory( AUTH_DIRECTORY );
+            MakeDirectory( PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" );
         }
     }
 
