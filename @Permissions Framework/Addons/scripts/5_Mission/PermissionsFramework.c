@@ -1,6 +1,7 @@
 class PermissionsFramework
 {
     protected ref array< Man > m_ServerPlayers;
+    protected ref array< PlayerIdentity > m_ServerIdentities;
 
     protected bool m_bLoaded;
 
@@ -11,6 +12,7 @@ class PermissionsFramework
         if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
         {
             m_ServerPlayers = new ref array< Man >;
+            m_ServerIdentities = new ref array< PlayerIdentity >;
         }
 
         m_bLoaded = false;
@@ -67,24 +69,38 @@ class PermissionsFramework
 
     }
 
+    private bool CheckIfExists( ref AuthPlayer auPlayer )
+    {
+        for ( int i = 0; i < m_ServerIdentities.Count(); i++ )
+        {
+            if ( auPlayer.GetGUID() == m_ServerIdentities[i].GetId() )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void ReloadPlayerList()
     {
         GetGame().GetPlayers( m_ServerPlayers );
-        
-        GetPlayerIndentities
 
-        for ( int i = 0; i < AuthPlayers.Count(); i++ )
+        GetGame().GetPlayerIndentities( m_ServerIdentities );
+
+        for ( int i = 0; i < GetPermissionsManager().AuthPlayers.Count(); i++ )
         {
-            ref AuthPlayer auPlayer = AuthPlayers[i];
-            
-            if ( auPlayer.GetGUID() == player.GetId() )
+            ref AuthPlayer auPlayer = GetPermissionsManager().AuthPlayers[i];
+
+            if ( !CheckIfExists() )
             {
                 auPlayer.Save();
 
                 GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
 
-                AuthPlayers.Remove( i );
-                break;
+                GetPermissionsManager().AuthPlayers.Remove( i );
+
+                i = i - 1;
             }
         }
 
@@ -107,6 +123,7 @@ class PermissionsFramework
         }
 
         m_ServerPlayers.Clear();
+        m_ServerIdentities.Clear();
     }
 
     void UpdatePlayers( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
