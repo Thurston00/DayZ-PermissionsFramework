@@ -13,6 +13,9 @@ class AuthPlayer
 
     protected ref PlayerFile m_PlayerFile;
 
+    protected bool m_HasPermissions;
+    protected bool m_HasPlayerData;
+
     void AuthPlayer( ref PlayerData data )
     {
         PlayerObject = NULL;
@@ -94,16 +97,40 @@ class AuthPlayer
         delete RootPermission;
 
         RootPermission = new ref Permission( Data.SSteam64ID, NULL );
+
+        m_HasPermissions = false;
     }
 
     void AddPermission( string permission, PermissionType type = PermissionType.INHERIT )
     {
         RootPermission.AddPermission( permission, type );
+
+        m_HasPermissions = true;
     }
 
     bool HasPermission( string permission )
     {
-        return RootPermission.HasPermission( permission );
+        bool has = RootPermission.HasPermission( permission );
+
+        if ( has )
+            return true;
+
+        for ( int j = 0; j < Roles.Count(); j++ )
+        {
+            if ( Roles[j].HasPermission( permission ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool AddRole( Role role )
+    {
+        m_HasPlayerData = true;
+
+        Roles.Insert( role );
     }
 
     ref array< string > Serialize()
@@ -137,25 +164,28 @@ class AuthPlayer
     {
         string filename = FileReadyStripName( Data.SSteam64ID );
 
-        Print( "Saving permissions for " + filename );
+        Print( "Saving permissions and player data for " + filename );
         FileHandle file = OpenFile( AUTH_DIRECTORY + filename + FILE_TYPE, FileMode.WRITE );
-            
+
         ref array< string > data = Serialize();
 
-        m_PlayerFile.Name = GetName();
-        m_PlayerFile.GUID = GetGUID();
-        m_PlayerFile.Steam64ID = GetSteam64ID();
-
-        m_PlayerFile.Roles.Clear();
-
-        for ( int j = 0; j < Roles.Count(); j++ )
+        if ( m_HasPlayerData )
         {
-            m_PlayerFile.Roles.Insert( Roles[j].Name );
+            m_PlayerFile.Name = GetName();
+            m_PlayerFile.GUID = GetGUID();
+            m_PlayerFile.Steam64ID = GetSteam64ID();
+
+            m_PlayerFile.Roles.Clear();
+
+            for ( int j = 0; j < Roles.Count(); j++ )
+            {
+                m_PlayerFile.Roles.Insert( Roles[j].Name );
+            }
+
+            m_PlayerFile.Save();
         }
 
-        m_PlayerFile.Save();
-
-        if ( file != 0 )
+        if ( m_HasPermissions && file != 0 )
         {
             string line;
 
@@ -165,12 +195,9 @@ class AuthPlayer
             }
             
             CloseFile(file);
-            
-            Print("Wrote to the players");
             return true;
         } else
         {
-            Print("Failed to open the file for the player for writing.");
             return false;
         }
     }
@@ -183,7 +210,7 @@ class AuthPlayer
             
         ref array< string > data = new ref array< string >;
 
-        m_PlayerFile.Load();
+        m_HasPlayerData = m_PlayerFile.Load();
 
         if ( file != 0 )
         {
@@ -200,12 +227,14 @@ class AuthPlayer
             {
                 AddPermission( data[i] );
             }
+
+            m_HasPermissions = true;
         } else
         {
-            Print( "Failed to open the file for the player to read. Attemping to create." );
+            Print( "Permissions file does not exist." );
 
-            // remove when not in testing...
-            Save();
+            m_HasPermissions = false;
+
             return false;
         }
         

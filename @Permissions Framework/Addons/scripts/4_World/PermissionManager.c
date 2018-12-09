@@ -120,7 +120,7 @@ class PermissionManager
 
         auPlayer.IdentityPlayer = player;
 
-        auPlayer.CopyPermissions( RootPermission );
+        // auPlayer.CopyPermissions( RootPermission );
 
         auPlayer.Load();
 
@@ -138,6 +138,26 @@ class PermissionManager
             ref AuthPlayer auPlayer = AuthPlayers[i];
             
             if ( auPlayer.GetGUID() == player.GetId() )
+            {
+                auPlayer.Save();
+
+                GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
+
+                AuthPlayers.Remove( i );
+                break;
+            }
+        }
+    }
+
+    void PlayerLeftID( string id )
+    {
+        if ( player == NULL ) return;
+
+        for ( int i = 0; i < AuthPlayers.Count(); i++ )
+        {
+            ref AuthPlayer auPlayer = AuthPlayers[i];
+            
+            if ( auPlayer.GetSteam64ID() == id )
             {
                 auPlayer.Save();
 

@@ -70,6 +70,23 @@ class PermissionsFramework
     void ReloadPlayerList()
     {
         GetGame().GetPlayers( m_ServerPlayers );
+        
+        GetPlayerIndentities
+
+        for ( int i = 0; i < AuthPlayers.Count(); i++ )
+        {
+            ref AuthPlayer auPlayer = AuthPlayers[i];
+            
+            if ( auPlayer.GetGUID() == player.GetId() )
+            {
+                auPlayer.Save();
+
+                GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
+
+                AuthPlayers.Remove( i );
+                break;
+            }
+        }
 
         for ( int i = 0; i < m_ServerPlayers.Count(); i++ )
         {

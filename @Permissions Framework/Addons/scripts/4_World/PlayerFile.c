@@ -11,16 +11,15 @@ class PlayerFile
         Roles = new ref array< string >;
     }
 
-    static ref PlayerFile Load()
+    bool Load()
     {
-        ref PlayerFile settings = new PlayerFile();
-
         if ( FileExist( PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" + settings.Steam64ID + ".json" ) )
         {
-            JsonFileLoader<PlayerFile>.JsonLoadFile( PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" + settings.Steam64ID + ".json", settings );
+            JsonFileLoader<PlayerFile>.JsonLoadFile( PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" + settings.Steam64ID + ".json", this );
+            return true;
         }
 
-        return settings;
+        return false;
     }
 
     void Save()
