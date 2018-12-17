@@ -126,7 +126,7 @@ class AuthPlayer
         return false;
     }
 
-    bool AddRole( Role role )
+    void AddRole( Role role )
     {
         m_HasPlayerData = true;
 

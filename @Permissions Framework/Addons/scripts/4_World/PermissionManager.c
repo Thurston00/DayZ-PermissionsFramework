@@ -151,8 +151,6 @@ class PermissionManager
 
     void PlayerLeftID( string id )
     {
-        if ( player == NULL ) return;
-
         for ( int i = 0; i < AuthPlayers.Count(); i++ )
         {
             ref AuthPlayer auPlayer = AuthPlayers[i];
