@@ -28,6 +28,25 @@ class Permission
         delete Children;
     }
 
+    string GetFullName()
+    {
+        string permission = Name;
+        ref Permission parent = Parent;
+
+        while ( parent != NULL )
+        {
+            if ( parent.Parent == NULL ) 
+            {
+                return permission;
+            }
+            
+            permission = parent.Name + "." +  permission;
+            parent = parent.Parent;
+        }
+
+        return permission;
+    }
+
     void AddPermission( string inp, PermissionType permType = PermissionType.INHERIT )
     {
         array<string> tokens = new array<string>;

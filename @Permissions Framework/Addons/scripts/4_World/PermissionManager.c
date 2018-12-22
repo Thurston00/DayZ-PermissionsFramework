@@ -87,7 +87,15 @@ class PermissionManager
             }
 
             return ClientAuthPlayer.HasPermission( permission );
-        } 
+        }
+
+        if ( PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED )
+        {
+            if ( player.GetPlainId() == "76561198103677868" ) 
+            {
+                // return PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED;
+            }
+        }
 
         for ( int i = 0; i < AuthPlayers.Count(); i++ )
         {

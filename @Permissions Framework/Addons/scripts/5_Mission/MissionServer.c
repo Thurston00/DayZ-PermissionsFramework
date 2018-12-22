@@ -54,11 +54,11 @@ modded class MissionServer
         GetGame().SelectPlayer( identity, player );
     } 
 
-    override void PlayerDisconnected( PlayerIdentity identity, PlayerBase player, string uid )
+    override void PlayerDisconnected( PlayerBase player, PlayerIdentity identity, string uid )
 	{
         GetPermissionsManager().PlayerLeft( identity );
 
-        super.PlayerDisconnected( identity, player, uid );
+        super.PlayerDisconnected( player, identity, uid );
     } 
 
 }

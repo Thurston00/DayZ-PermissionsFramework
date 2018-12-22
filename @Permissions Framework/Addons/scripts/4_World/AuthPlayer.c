@@ -160,15 +160,8 @@ class AuthPlayer
         return name;
     }
 
-    bool Save()
+    void Save()
     {
-        string filename = FileReadyStripName( Data.SSteam64ID );
-
-        Print( "Saving permissions and player data for " + filename );
-        FileHandle file = OpenFile( AUTH_DIRECTORY + filename + FILE_TYPE, FileMode.WRITE );
-
-        ref array< string > data = Serialize();
-
         if ( m_HasPlayerData )
         {
             m_PlayerFile.Name = GetName();
@@ -185,20 +178,25 @@ class AuthPlayer
             m_PlayerFile.Save();
         }
 
-        if ( m_HasPermissions && file != 0 )
+        if ( m_HasPermissions )
         {
-            string line;
+            string filename = FileReadyStripName( Data.SSteam64ID );
 
-            for ( int i = 0; i < data.Count(); i++ )
+            ref array< string > data = Serialize();
+            Print( "Saving permissions and player data for " + filename );
+            FileHandle file = OpenFile( AUTH_DIRECTORY + filename + FILE_TYPE, FileMode.WRITE );
+
+            if ( file != 0 )
             {
-                FPrintln( file, data[i] );
+                string line;
+
+                for ( int i = 0; i < data.Count(); i++ )
+                {
+                    FPrintln( file, data[i] );
+                }
+                
+                CloseFile(file);
             }
-            
-            CloseFile(file);
-            return true;
-        } else
-        {
-            return false;
         }
     }
 
@@ -231,8 +229,6 @@ class AuthPlayer
             m_HasPermissions = true;
         } else
         {
-            Print( "Permissions file does not exist." );
-
             m_HasPermissions = false;
 
             return false;
@@ -251,29 +247,10 @@ class AuthPlayer
     // TODO: Figure out how to make it work properly?
     void Kick()
     {
-        ForceDisconnect();
     }
 
     // TODO: Maybe actually ban the player?
     void Ban()
     {
-        ForceDisconnect();
-    }
-
-    private void ForceDisconnect()
-    {
-        if ( IdentityPlayer )
-        {
-            if ( PlayerObject.CanBeDeleted() )
-            {
-                PlayerObject.Delete();	
-            }
-            else
-            {
-                PlayerObject.SetHealth( "", "", 0.0 );
-            }
-
-            GetGame().DisconnectPlayer( IdentityPlayer, IdentityPlayer.GetId() );
-        }
     }
 }

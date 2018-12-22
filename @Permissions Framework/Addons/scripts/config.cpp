@@ -1,6 +1,6 @@
 class CfgPatches
 {
-    class Permissions_Framework_Scripts
+    class JM_Permissions_Framework_Scripts
     {
         units[]={};
         weapons[]={};
@@ -14,9 +14,9 @@ class CfgPatches
 
 class CfgMods
 {
-    class Permissions_Framework
+    class JM_Permissions_Framework
     {
-        dir = "PermissionsFramework";
+        dir = "JM";
         picture = "";
         action = "";
         hideName = 1;
@@ -36,19 +36,19 @@ class CfgMods
             class gameScriptModule
             {
                 value = "";
-                files[] = {"PermissionsFramework/Scripts/3_Game"};
+                files[] = {"JM/PermissionsFramework/Scripts/3_Game"};
             };
 
             class worldScriptModule
             {
                 value = "";
-                files[] = {"PermissionsFramework/Scripts/4_World"};
+                files[] = {"JM/PermissionsFramework/Scripts/4_World"};
             };
 
             class missionScriptModule
             {
                 value = "";
-                files[] = {"PermissionsFramework/Scripts/5_Mission"};
+                files[] = {"JM/PermissionsFramework/Scripts/5_Mission"};
             };
         }
     };
