@@ -56,7 +56,7 @@ class Permission
 
         PermissionType type;
 
-        if ( type == PermissionType.INHERIT && spaces.Count() == 2 )
+        if ( permType == PermissionType.INHERIT && spaces.Count() == 2 )
         {
             if ( spaces[1].Contains( "2" ) )
             {
