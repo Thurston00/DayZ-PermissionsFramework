@@ -38,6 +38,30 @@ modded class MissionServer
         m_PermissionsFramework.Update( timeslice );
     }
 
+// TODO: Fully implement this as a better way for permissions
+/*
+    override void OnEvent( EventType eventTypeId, Param params ) 
+	{
+		super.OnEvent( eventTypeId, params );
+		PlayerIdentity identity;
+
+		switch(eventTypeId)
+		{
+			case ChatMessageEventTypeID:
+                ChatMessageEventParams chat_params = ChatMessageEventParams.Cast( params );
+
+                if ( chat_params.param1 == 0 && chat_params.param2 != "" )
+                {
+                    if ( chat_params.param3 == "/givefull" )
+                    {
+
+                    }
+                }
+                break;
+		}
+	}
+*/
+
 	override void OnPreloadEvent(PlayerIdentity identity, out bool useDB, out vector pos, out float yaw, out int queueTime)
 	{
         super.OnPreloadEvent( identity, useDB, pos, yaw, queueTime );
