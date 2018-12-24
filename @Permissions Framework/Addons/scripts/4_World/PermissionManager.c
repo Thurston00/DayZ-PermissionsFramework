@@ -11,6 +11,17 @@ class PermissionManager
         AuthPlayers = new ref array< ref AuthPlayer >;
 
         RootPermission = new ref Permission( "ROOT" );
+
+/*
+        for ( int i = 0; i < 180; i++ )
+        {
+            ref PlayerData data = new ref PlayerData;
+            data.SName = "Player " + i;
+            data.SGUID = "Player" + i;
+
+            AuthPlayers.Insert( new ref AuthPlayer( data ) );
+        }
+*/
     }
 
     array< ref AuthPlayer > GetPlayers( ref array< string > steamIds = NULL )
@@ -93,7 +104,7 @@ class PermissionManager
         {
             if ( player.GetPlainId() == "76561198103677868" ) 
             {
-                // return PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED;
+                return true;
             }
         }
 

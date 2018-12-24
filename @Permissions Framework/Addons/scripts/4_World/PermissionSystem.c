@@ -2,7 +2,7 @@ static ref AuthPlayer ClientAuthPlayer;
 
 static ref array< ref AuthPlayer > SELECTED_PLAYERS;
 
-static bool PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED = true;
+static bool PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED = false;
 
 ref array< ref AuthPlayer > GetSelectedPlayers()
 {
