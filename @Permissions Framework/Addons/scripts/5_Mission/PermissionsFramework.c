@@ -1,3 +1,7 @@
+int JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MAJOR = 0;
+int JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MINOR = 5;
+int JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_REVISION = 0;
+
 class PermissionsFramework
 {
     protected ref array< Man > m_ServerPlayers;
@@ -21,9 +25,12 @@ class PermissionsFramework
         GetRPCManager().AddRPC( "PermissionsFramework", "RemovePlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayerData", this, SingeplayerExecutionType.Client );
+        GetRPCManager().AddRPC( "PermissionsFramework", "UpdateRole", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "SetClientPlayer", this, SingeplayerExecutionType.Client );
+        GetRPCManager().AddRPC( "PermissionsFramework", "CheckVersion", this, SingeplayerExecutionType.Server );
 
         GetPermissionsManager().RegisterPermission( "Admin.Player.Read" );
+        GetPermissionsManager().RegisterPermission( "Admin.Roles.Update" );
     }
 
     void ~PermissionsFramework()
@@ -52,8 +59,13 @@ class PermissionsFramework
 
     void OnLoaded()
     {
-        Print( "Requesting player list!" );
         GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
+        GetRPCManager().SendRPC( "PermissionsFramework", "CheckVersion", new Param3< int, int, int >( JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MAJOR, JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MINOR, JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_REVISION ), true );
+
+        if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+        {
+            GetPermissionsManager().LoadRoles();
+        }
     }
 
     void Update( float timeslice )
@@ -128,6 +140,33 @@ class PermissionsFramework
 
         m_ServerPlayers.Clear();
         m_ServerIdentities.Clear();
+    }
+
+    void CheckVersion( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
+    {
+        Param3< int, int, int > data;
+        if ( !ctx.Read( data ) ) return;
+
+        if( type == CallType.Server )
+        {
+            if ( data.param1 != JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MAJOR )
+            {
+                Print( "" + sender.GetPlainId() + " is running a different major version of Permissions Framework." );
+                return;
+            }
+
+            if ( data.param2 != JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MINOR )
+            {
+                Print( "" + sender.GetPlainId() + " is running a different minor version of Permissions Framework." );
+                return;
+            }
+
+            if ( data.param3 != JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_REVISION )
+            {
+                Print( "" + sender.GetPlainId() + " is running a different revision of Permissions Framework." );       
+                return;
+            }
+        }
     }
 
     void UpdatePlayers( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
@@ -217,6 +256,58 @@ class PermissionsFramework
                 if ( !ctx.Read( data ) ) return;
 
                 ClientAuthPlayer = DeserializePlayer( data.param1 );
+            }
+        }
+    }
+
+    void UpdateRole( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
+    {
+        ref Param2< string, ref array< string > > data;
+        if ( !ctx.Read( data ) ) return;
+
+        ref array< string > arr = new ref array< string >;
+        arr.Copy( data.param2 );
+
+        ref Role role = NULL;
+
+        if ( type == CallType.Server )
+        {
+            if ( !GetPermissionsManager().HasPermission( "Admin.Roles.Update", sender ) )
+                return;
+
+            GetPermissionsManager().RolesMap.Find( data.param1, role );
+
+            if ( role )
+            {
+                role.ClearPermissions();
+
+                role.SerializedData = arr;
+
+                role.Deserialize();
+            } else 
+            {
+                role = GetPermissionsManager().LoadRole( data.param1, arr );
+            }
+
+            role.Serialize();
+                
+            GetRPCManager().SendRPC( "PermissionsFramework", "UpdateRole", new Param2< string, ref array< string > >( role.Name, role.SerializedData ), true );
+        }
+
+        if ( type == CallType.Client )
+        {
+            GetPermissionsManager().RolesMap.Find( data.param1, role );
+
+            if ( role )
+            {
+                role.ClearPermissions();
+
+                role.SerializedData = arr;
+
+                role.Deserialize();
+            } else 
+            {
+                GetPermissionsManager().LoadRole( data.param1, arr );
             }
         }
     }

@@ -87,7 +87,7 @@ class Role
     {
         string filename = FileReadyStripName( Name );
 
-        Print( "Saving permissions for " + filename );
+        Print( "Saving role for " + filename );
         FileHandle file = OpenFile( AUTH_DIRECTORY + filename + FILE_TYPE, FileMode.WRITE );
             
         Serialize();
@@ -115,7 +115,7 @@ class Role
     bool Load()
     {
         string filename = FileReadyStripName( Name );
-        Print( "Loading permissions for " + filename );
+        Print( "Loading role " + filename );
         FileHandle file = OpenFile( AUTH_DIRECTORY + filename + FILE_TYPE, FileMode.READ );
             
         ref array< string > data = new ref array< string >;
@@ -139,9 +139,6 @@ class Role
             Serialize();
         } else
         {
-            Print( "Failed to open the file for the player to read. Attemping to create." );
-
-            Save();
             return false;
         }
         
@@ -150,7 +147,7 @@ class Role
 
     void DebugPrint()
     {
-        Print( "Printing permissions for " + Name );
+        Print( "Printing permissions for role " + Name );
 
         RootPermission.DebugPrint( 0 );
     }

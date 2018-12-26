@@ -3,12 +3,16 @@ const string PERMISSION_FRAMEWORK_DIRECTORY = "$profile:PermissionsFramework\\";
 class PermissionManager
 {
     ref array< ref AuthPlayer > AuthPlayers;
+    ref array< ref Role > Roles;
+    ref map< string, ref Role > RolesMap;
 
     ref Permission RootPermission;
 
     void PermissionManager()
     {
         AuthPlayers = new ref array< ref AuthPlayer >;
+        Roles = new ref array< ref Role >;
+        RolesMap = new ref map< string, ref Role >;
 
         RootPermission = new ref Permission( "ROOT" );
 
@@ -299,6 +303,74 @@ class PermissionManager
         auPlayer.Deserialize();
 
         return auPlayer;
+    }
+
+	protected bool IsValidFolderForRoles( string name, FileAttr attributes )
+    {
+		string extenstion = ".txt";
+		int strLength = name.Length();
+
+		if ( name == extenstion ) return false;
+
+        if ( (attributes & FileAttr.DIRECTORY ) ) return false;
+
+        if ( name == "" ) return false;
+
+        return true;
+    }
+
+    ref Role LoadRole( string name, ref array< string > data = NULL )
+    {
+        ref Role role = new ref Role( name );
+
+        if ( data == NULL )
+        {
+            if ( role.Load() )
+            {
+                Roles.Insert( role );
+                RolesMap.Insert( name, role );
+            } 
+        } else
+        {
+            role.SerializedData = data;
+            role.Deserialize();
+
+            if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+            {
+                role.Save();
+            }
+
+            Roles.Insert( role );
+            RolesMap.Insert( name, role );
+        }
+
+        return role;
+    }
+
+    void LoadRoles()
+    {
+        Print("Loading roles.");
+        string sName = "";
+		FileAttr oFileAttr = FileAttr.INVALID;
+		FindFileHandle oFileHandle = FindFile(PERMISSION_FRAMEWORK_DIRECTORY + "Roles\\*.txt", sName, oFileAttr, FindFileFlags.ALL);
+
+		if (sName != "")
+		{
+            Print("Loading role: " + sName);
+			if ( IsValidFolderForRoles( sName, oFileAttr ) )
+			{
+                LoadRole( sName.Substring(0, sName.Length() - 4) );
+			}
+
+			while (FindNextFile(oFileHandle, sName, oFileAttr))
+			{
+                Print("Loading role: " + sName);
+				if ( IsValidFolderForRoles( sName, oFileAttr ))
+				{
+                    LoadRole( sName.Substring(0, sName.Length() - 4) );
+				}
+			}
+		}
     }
 }
 

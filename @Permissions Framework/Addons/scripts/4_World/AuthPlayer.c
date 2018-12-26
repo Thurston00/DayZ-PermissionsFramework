@@ -126,6 +126,16 @@ class AuthPlayer
         return false;
     }
 
+    void AddStringRole( string role )
+    {
+        ref Role r = GetPermissionsManager().RolesMap.Get( role );
+
+        if ( Roles.Find( r ) < 0 ) 
+        {
+            AddRole( r );
+        }
+    }
+
     void AddRole( Role role )
     {
         m_HasPlayerData = true;
@@ -133,13 +143,17 @@ class AuthPlayer
         Roles.Insert( role );
     }
 
-    ref array< string > Serialize()
-    {        
+    void Serialize()
+    {
         Data.APermissions.Clear();
+        Data.ARoles.Clear();
 
         RootPermission.Serialize( Data.APermissions );
 
-        return Data.APermissions;
+        for ( int j = 0; j < Roles.Count(); j++ )
+        {
+            Data.ARoles.Insert( Roles[j].Name );
+        }
     }
 
     void Deserialize()
@@ -147,6 +161,11 @@ class AuthPlayer
         for ( int i = 0; i < Data.APermissions.Count(); i++ )
         {
             AddPermission( Data.APermissions[i] );
+        }
+
+        for ( int j = 0; j < Data.ARoles.Count(); j++ )
+        {
+            AddStringRole( Data.ARoles[j] );
         }
     }
 
@@ -182,7 +201,8 @@ class AuthPlayer
         {
             string filename = FileReadyStripName( Data.SSteam64ID );
 
-            ref array< string > data = Serialize();
+            Serialize();
+
             Print( "Saving permissions and player data for " + filename );
             FileHandle file = OpenFile( AUTH_DIRECTORY + filename + FILE_TYPE, FileMode.WRITE );
 
@@ -190,9 +210,9 @@ class AuthPlayer
             {
                 string line;
 
-                for ( int i = 0; i < data.Count(); i++ )
+                for ( int i = 0; i < Data.APermissions.Count(); i++ )
                 {
-                    FPrintln( file, data[i] );
+                    FPrintln( file, Data.APermissions[i] );
                 }
                 
                 CloseFile(file);
@@ -209,6 +229,14 @@ class AuthPlayer
         ref array< string > data = new ref array< string >;
 
         m_HasPlayerData = m_PlayerFile.Load();
+
+        if ( m_HasPlayerData )
+        {
+            for ( int j = 0; j < m_PlayerFile.Roles.Count(); j++ )
+            {
+                AddStringRole( m_PlayerFile.Roles[j] );
+            }
+        }
 
         if ( file != 0 )
         {
