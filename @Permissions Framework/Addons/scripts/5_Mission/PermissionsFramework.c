@@ -192,8 +192,11 @@ class PermissionsFramework
             {
                 ref Param1< ref PlayerData > data;
                 if ( !ctx.Read( data ) ) return;
+                
+                ref AuthPlayer authPlayer = DeserializePlayer( data.param1 );
 
-                GetPermissionsManager().AuthPlayers.RemoveItem( DeserializePlayer( data.param1 ) );
+                RemoveSelectedPlayer( authPlayer );
+                GetPermissionsManager().AuthPlayers.RemoveItem( authPlayer );
             }
         }
     }
