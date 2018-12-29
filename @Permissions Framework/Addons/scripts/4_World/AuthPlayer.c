@@ -110,14 +110,23 @@ class AuthPlayer
 
     bool HasPermission( string permission )
     {
-        bool has = RootPermission.HasPermission( permission );
+        PermissionType permType;
+        PermissionType rolePermType;
+
+        bool has = RootPermission.HasPermission( permission, permType );
+
+        Print( "Player " +  GetName() + " is " + has + " with perm type " + permType );
 
         if ( has )
             return true;
 
         for ( int j = 0; j < Roles.Count(); j++ )
         {
-            if ( Roles[j].HasPermission( permission ) )
+            bool roleHas = Roles[j].HasPermission( permission, rolePermType );
+
+            Print( "Role " +  Roles[j].Name + " is " + roleHas + " with perm type " + rolePermType );
+
+            if ( roleHas )
             {
                 return true;
             }
@@ -130,6 +139,8 @@ class AuthPlayer
     {
         ref Role r = GetPermissionsManager().RolesMap.Get( role );
 
+        Print( "Adding role " + role + ": " + r );
+
         if ( Roles.Find( r ) < 0 ) 
         {
             AddRole( r );
@@ -138,6 +149,8 @@ class AuthPlayer
 
     void AddRole( Role role )
     {
+        Print( "Adding role " + role );
+
         m_HasPlayerData = true;
 
         Roles.Insert( role );
@@ -182,10 +195,21 @@ class AuthPlayer
     void Save()
     {
         if ( m_HasPlayerData )
-        {
-            m_PlayerFile.Name = GetName();
-            m_PlayerFile.GUID = GetGUID();
-            m_PlayerFile.Steam64ID = GetSteam64ID();
+        {   
+            if ( m_PlayerFile.Steam64ID != GetSteam64ID() )
+            {
+                m_PlayerFile.Steam64ID = GetSteam64ID();
+            }
+
+            if ( m_PlayerFile.GUID != GetGUID() )
+            {
+                m_PlayerFile.GUID = GetGUID();
+            }
+
+            if ( m_PlayerFile.Names.Find( GetName() ) < 0 )
+            {   
+                m_PlayerFile.Names.Insert( GetName() );
+            }
 
             m_PlayerFile.Roles.Clear();
 
@@ -228,14 +252,14 @@ class AuthPlayer
             
         ref array< string > data = new ref array< string >;
 
-        m_HasPlayerData = m_PlayerFile.Load();
+        m_HasPlayerData = m_PlayerFile.Load( IdentityPlayer );
 
-        if ( m_HasPlayerData )
+        Print( m_HasPlayerData );
+        Print( m_PlayerFile.Roles );
+
+        for ( int j = 0; j < m_PlayerFile.Roles.Count(); j++ )
         {
-            for ( int j = 0; j < m_PlayerFile.Roles.Count(); j++ )
-            {
-                AddStringRole( m_PlayerFile.Roles[j] );
-            }
+            AddStringRole( m_PlayerFile.Roles[j] );
         }
 
         if ( file != 0 )

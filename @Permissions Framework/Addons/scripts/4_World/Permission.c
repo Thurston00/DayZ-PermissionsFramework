@@ -168,7 +168,7 @@ class Permission
         return this;
     }
 
-    bool HasPermission( string inp )
+    bool HasPermission( string inp, out PermissionType permType )
     {
         array<string> tokens = new array<string>;
         inp.Split( ".", tokens );
@@ -189,14 +189,14 @@ class Permission
 
         if ( depth > -1 )
         {
-            return Check( tokens, depth + 1, parentDisallowed );
+            return Check( tokens, depth + 1, parentDisallowed, permType );
         } else 
         {
-            return Check( tokens, 0, parentDisallowed );
+            return Check( tokens, 0, parentDisallowed, permType );
         }
     }
 
-    bool Check( array<string> tokens, int depth, bool parentDisallowed )
+    bool Check( array<string> tokens, int depth, bool parentDisallowed, out PermissionType permType )
     {
         bool ifReturnAs = false;
 
@@ -234,9 +234,11 @@ class Permission
 
             if ( nChild )
             {
-                return nChild.Check( tokens, depth + 1, parentDisallowed );
+                return nChild.Check( tokens, depth + 1, parentDisallowed, permType );
             }
         }
+
+        permType = Type;
 
         return ifReturnAs;
     }

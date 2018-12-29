@@ -51,9 +51,9 @@ class Role
         RootPermission.AddPermission( permission, type );
     }
 
-    bool HasPermission( string permission )
+    bool HasPermission( string permission, out PermissionType permType )
     {
-        return RootPermission.HasPermission( permission );
+        return RootPermission.HasPermission( permission, permType );
     }
 
     ref array< string > Serialize()
