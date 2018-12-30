@@ -14,9 +14,23 @@ class PlayerFile
 
     bool Load( PlayerIdentity identity )
     {
-        if ( FileExist( PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" + identity.GetPlainId() + ".json" ) )
+        if ( identity == NULL ) return false;
+        
+        ref PlayerFile playerFile = new ref PlayerFile;
+        string file = PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" + identity.GetPlainId() + ".json";
+        if ( FileExist( file ) )
         {
-            JsonFileLoader<PlayerFile>.JsonLoadFile( PERMISSION_FRAMEWORK_DIRECTORY + "Players\\" + identity.GetPlainId() + ".json", this );
+            JsonFileLoader<PlayerFile>.JsonLoadFile( file, playerFile );
+
+            if ( playerFile == NULL )
+            {
+                return false;
+            }
+
+            Names = playerFile.Names;
+            GUID = playerFile.GUID;
+            Steam64ID = playerFile.Steam64ID;
+            Roles = playerFile.Roles;
 
             bool requiresSaving = false;
 

@@ -330,6 +330,8 @@ class PermissionManager
 
         Roles.Insert( role );
         RolesMap.Insert( name, role );
+
+        return role;
     }
 
     ref Role LoadRole( string name, ref array< string > data = NULL )

@@ -49,7 +49,7 @@ class PermissionsFramework
     {
         if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
         {
-            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
+            GetPermissionsManager().LoadRoles();
         }
     }
 
@@ -59,12 +59,15 @@ class PermissionsFramework
 
     void OnLoaded()
     {
-        GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
-        GetRPCManager().SendRPC( "PermissionsFramework", "CheckVersion", new Param3< int, int, int >( JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MAJOR, JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MINOR, JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_REVISION ), true );
+        if ( GetGame().IsClient() && GetGame().IsMultiplayer() )
+        {
+            GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param, true );
+            GetRPCManager().SendRPC( "PermissionsFramework", "CheckVersion", new Param3< int, int, int >( JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MAJOR, JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_MINOR, JM_PERMISSIONS_FRAMEWORK_CURRENT_VERSION_REVISION ), true );
+        }
 
         if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
         {
-            GetPermissionsManager().LoadRoles();
+            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
         }
     }
 
