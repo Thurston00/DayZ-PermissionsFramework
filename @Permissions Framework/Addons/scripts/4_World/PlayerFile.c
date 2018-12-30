@@ -8,6 +8,7 @@ class PlayerFile
 
     void PlayerFile()
     {
+        Names = new ref array< string >;
         Roles = new ref array< string >;
     }
 
@@ -43,11 +44,10 @@ class PlayerFile
             }
             
             return true;
+        } else 
+        {
+            return false;
         }
-
-        Roles.Insert( "everyone" );
-
-        return false;
     }
 
     void Save()

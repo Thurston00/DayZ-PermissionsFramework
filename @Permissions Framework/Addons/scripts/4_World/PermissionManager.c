@@ -318,6 +318,19 @@ class PermissionManager
 
         return true;
     }
+    
+    ref Role CreateRole( string name, ref array< string > data )
+    {
+        ref Role role = new ref Role( name );
+
+        role.SerializedData.Copy( data );
+        role.Deserialize();
+
+        role.Save();
+
+        Roles.Insert( role );
+        RolesMap.Insert( name, role );
+    }
 
     ref Role LoadRole( string name, ref array< string > data = NULL )
     {
@@ -329,7 +342,7 @@ class PermissionManager
             {
                 Roles.Insert( role );
                 RolesMap.Insert( name, role );
-            } 
+            }
         } else
         {
             role.SerializedData = data;
@@ -349,14 +362,12 @@ class PermissionManager
 
     void LoadRoles()
     {
-        Print("Loading roles.");
         string sName = "";
 		FileAttr oFileAttr = FileAttr.INVALID;
 		FindFileHandle oFileHandle = FindFile(PERMISSION_FRAMEWORK_DIRECTORY + "Roles\\*.txt", sName, oFileAttr, FindFileFlags.ALL);
 
 		if (sName != "")
 		{
-            Print("Loading role: " + sName);
 			if ( IsValidFolderForRoles( sName, oFileAttr ) )
 			{
                 LoadRole( sName.Substring(0, sName.Length() - 4) );
@@ -364,13 +375,17 @@ class PermissionManager
 
 			while (FindNextFile(oFileHandle, sName, oFileAttr))
 			{
-                Print("Loading role: " + sName);
 				if ( IsValidFolderForRoles( sName, oFileAttr ))
 				{
                     LoadRole( sName.Substring(0, sName.Length() - 4) );
 				}
 			}
 		}
+    }
+
+    bool RoleExists( string role )
+    {
+        return RolesMap.Contains( role );
     }
 }
 
