@@ -16,16 +16,22 @@ class PermissionManager
 
         RootPermission = new ref Permission( "ROOT" );
 
-/*
-        for ( int i = 0; i < 180; i++ )
+        if ( PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED )
         {
-            ref PlayerData data = new ref PlayerData;
-            data.SName = "Player " + i;
-            data.SGUID = "Player" + i;
+            for ( int i = 0; i < 1; i++ )
+            {
+                ref PlayerData data = new ref PlayerData;
+                data.SName = "Player " + i;
+                data.SGUID = "Player" + i;
 
-            AuthPlayers.Insert( new ref AuthPlayer( data ) );
+                data.VPosition = "0 0 0";
+                //data.VPosition[0] = Math.RandomFloat( 1000, 9000 );
+                //data.VPosition[1] = Math.RandomFloat( 5, 50 );
+                //data.VPosition[2] = Math.RandomFloat( 1000, 9000 );
+
+                AuthPlayers.Insert( new ref AuthPlayer( data ) );
+            }
         }
-*/
     }
 
     array< ref AuthPlayer > GetPlayers( ref array< string > steamIds = NULL )

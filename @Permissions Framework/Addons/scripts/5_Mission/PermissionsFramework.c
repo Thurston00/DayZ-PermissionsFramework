@@ -106,21 +106,23 @@ class PermissionsFramework
 
         GetGame().GetPlayerIndentities( m_ServerIdentities );
 
-        for ( int i = 0; i < GetPermissionsManager().AuthPlayers.Count(); i++ )
+        if ( !PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED )
         {
-            ref AuthPlayer ap = GetPermissionsManager().AuthPlayers[i];
-
-            if ( !CheckIfExists( ap ) )
+            for ( int i = 0; i < GetPermissionsManager().AuthPlayers.Count(); i++ )
             {
-                ap.Save();
+                ref AuthPlayer ap = GetPermissionsManager().AuthPlayers[i];
 
-                GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( ap ) ), true );
+                if ( !CheckIfExists( ap ) )
+                {
+                    ap.Save();
 
-                GetPermissionsManager().AuthPlayers.Remove( i );
+                    GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( ap ) ), true );
 
-                i = i - 1;
+                    GetPermissionsManager().AuthPlayers.Remove( i );
+
+                    i = i - 1;
+                }
             }
-            
         }
 
         for ( int j = 0; j < m_ServerPlayers.Count(); j++ )
