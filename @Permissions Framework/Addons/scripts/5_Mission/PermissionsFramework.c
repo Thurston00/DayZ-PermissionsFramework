@@ -24,7 +24,9 @@ class PermissionsFramework
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayers", this, SingeplayerExecutionType.Server );
         GetRPCManager().AddRPC( "PermissionsFramework", "RemovePlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayer", this, SingeplayerExecutionType.Client );
-        GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayerData", this, SingeplayerExecutionType.Client );
+        GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayerData", this, SingeplayerExecutionType.Client )
+        GetRPCManager().AddRPC( "PermissionsFramework", "UpdateAllPlayerObjects", this, SingeplayerExecutionType.Server );
+        GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayerObject", this, SingeplayerExecutionType.Client );;
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdateRole", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "SetClientPlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "CheckVersion", this, SingeplayerExecutionType.Server );
@@ -238,7 +240,7 @@ class PermissionsFramework
                 ref AuthPlayer player = GetPermissionsManager().GetPlayerByGUID( data.param1 );
                 if ( !player ) return;
 
-                GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayerData", new Param1< ref PlayerData >( SerializePlayer( player ) ), true, sender );
+                GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayerData", new Param1< ref PlayerData >( SerializePlayer( player ) ), true, sender, player.PlayerObject );
             }
         }
 
@@ -249,7 +251,50 @@ class PermissionsFramework
                 ref Param1< ref PlayerData > cdata;
                 if ( !ctx.Read( cdata ) ) return;
 
-                DeserializePlayer( cdata.param1 );
+                DeserializePlayer( cdata.param1 ).PlayerObject = target;
+            }
+        }
+    }
+
+    void UpdateAllPlayerObjects( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
+    {
+        if ( type == CallType.Server )
+        {
+            if ( !GetPermissionsManager().HasPermission( "Admin.Player.Read.Positions", sender ) )
+                return;
+
+            if ( GetGame().IsMultiplayer() )
+            {
+                for ( int i = 0; i < GetPermissionsManager().GetPlayers().Count(); i++ )
+                {
+                    ref AuthPlayer player = GetPermissionsManager().GetPlayers()[i];
+
+                    if ( player == NULL || player.PlayerObject == NULL )
+                    {
+                        continue;
+                    }
+
+                    GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayerObject", new Param1< string >( player.GetGUID() ), true, sender, player.PlayerObject );
+                }
+            }
+        }
+    }
+
+    void UpdatePlayerObject( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
+    {
+        if ( type == CallType.Client )
+        {
+            if ( GetGame().IsMultiplayer() )
+            {
+                ref Param1< string > cdata;
+                if ( !ctx.Read( cdata ) ) return;
+
+                ref AuthPlayer player = GetPermissionsManager().GetPlayerByGUID( cdata.param1 );
+
+                if ( player )
+                {
+                    player.PlayerObject = target;
+                }
             }
         }
     }

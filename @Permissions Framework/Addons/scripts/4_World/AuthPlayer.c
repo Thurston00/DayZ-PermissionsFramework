@@ -115,16 +115,12 @@ class AuthPlayer
 
         bool has = RootPermission.HasPermission( permission, permType );
 
-        Print( "Player " +  GetName() + " is " + has + " with perm type " + permType );
-
         if ( has )
             return true;
 
         for ( int j = 0; j < Roles.Count(); j++ )
         {
             bool roleHas = Roles[j].HasPermission( permission, rolePermType );
-
-            Print( "Role " +  Roles[j].Name + " is " + roleHas + " with perm type " + rolePermType );
 
             if ( roleHas )
             {
@@ -133,6 +129,11 @@ class AuthPlayer
         }
 
         return false;
+    }
+
+    void ClearRoles()
+    {
+        Roles.Clear();
     }
 
     void AddStringRole( string role )

@@ -16,6 +16,7 @@ class PermissionManager
 
         RootPermission = new ref Permission( "ROOT" );
 
+/*
         if ( PERRMISSIONS_FRAMEWORK_DEBUG_MODE_ENABLED )
         {
             for ( int i = 0; i < 1; i++ )
@@ -24,14 +25,18 @@ class PermissionManager
                 data.SName = "Player " + i;
                 data.SGUID = "Player" + i;
 
-                data.VPosition = "0 0 0";
-                //data.VPosition[0] = Math.RandomFloat( 1000, 9000 );
-                //data.VPosition[1] = Math.RandomFloat( 5, 50 );
-                //data.VPosition[2] = Math.RandomFloat( 1000, 9000 );
+                vector position = "0 0 0";
 
-                AuthPlayers.Insert( new ref AuthPlayer( data ) );
+                //position[0] = Math.RandomFloat( 1000, 9000 );
+                //position[1] = Math.RandomFloat( 5, 50 );
+                //position[2] = Math.RandomFloat( 1000, 9000 );
+
+                ref AuthPlayer player = new ref AuthPlayer( data );
+                player.PlayerObject = GetGame().CreateObject( "SurvivorM_Mirek", position, false, true )
+                AuthPlayers.Insert( player );
             }
         }
+*/
     }
 
     array< ref AuthPlayer > GetPlayers( ref array< string > steamIds = NULL )
