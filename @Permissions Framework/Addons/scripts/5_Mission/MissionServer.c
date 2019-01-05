@@ -72,7 +72,26 @@ modded class MissionServer
     override void InvokeOnConnect( PlayerBase player, PlayerIdentity identity)
 	{
         super.InvokeOnConnect( player, identity );
+
+        SetClientPermissionsOnConnection( identity, player );
+    } 
+
+	override void OnClientReconnectEvent( PlayerIdentity identity, PlayerBase player )
+	{
+        super.OnClientReconnectEvent( identity, player );
         
+        SetClientPermissionsOnConnection( identity, player );
+    }
+
+    override void PlayerDisconnected( PlayerBase player, PlayerIdentity identity, string uid )
+	{
+        GetPermissionsManager().PlayerLeft( identity );
+
+        super.PlayerDisconnected( player, identity, uid );
+    } 
+
+    void SetClientPermissionsOnConnection( PlayerIdentity identity, PlayerBase player )
+    {
         for ( int i = 0; i < GetPermissionsManager().Roles.Count(); i++ )
         {
             ref Role role = GetPermissionsManager().Roles[i];
@@ -83,13 +102,6 @@ modded class MissionServer
         GetRPCManager().SendRPC( "PermissionsFramework", "SetClientPlayer", new Param1< ref PlayerData >( SerializePlayer( GetPermissionsManager().GetPlayerByIdentity( identity ) ) ), true, identity );
 
         GetGame().SelectPlayer( identity, player );
-    } 
-
-    override void PlayerDisconnected( PlayerBase player, PlayerIdentity identity, string uid )
-	{
-        GetPermissionsManager().PlayerLeft( identity );
-
-        super.PlayerDisconnected( player, identity, uid );
-    } 
+    }
 
 }
