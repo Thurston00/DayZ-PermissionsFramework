@@ -88,6 +88,27 @@ modded class MissionServer
         GetPermissionsManager().PlayerLeft( identity );
 
         super.PlayerDisconnected( player, identity, uid );
+
+/*
+        for ( int i = 0; i < GetPermissionsManager().AuthPlayers.Count(); i++ )
+        {
+            ref AuthPlayer ap = GetPermissionsManager().AuthPlayers[i];
+
+            for ( int j = 0; j < identities.Count(); j++ )
+            {
+                if ( ap.GetGUID() == identities[j].GetId() )
+                {
+                    ap.Save();
+
+                    GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( ap ) ), true );
+
+                    GetPermissionsManager().AuthPlayers.Remove( i );
+
+                    i = i - 1;
+                }
+            }
+        }
+*/
     } 
 
     void SetClientPermissionsOnConnection( PlayerIdentity identity, PlayerBase player )

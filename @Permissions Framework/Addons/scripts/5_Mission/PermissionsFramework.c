@@ -6,11 +6,17 @@ class PermissionsFramework
 {
     protected bool m_bLoaded;
 
+    protected int m_Index;
+    protected int m_UpdateMax;
+
+    protected ref array< Man > m_Players;
+
     void PermissionsFramework()
     {
         MakeDirectory( PERMISSION_FRAMEWORK_DIRECTORY );
 
         m_bLoaded = false;
+        m_Players = new ref array< Man >;
 
         GetRPCManager().AddRPC( "PermissionsFramework", "RemovePlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayer", this, SingeplayerExecutionType.Client );
@@ -55,7 +61,9 @@ class PermissionsFramework
 
         if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
         {
-            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 1000, true );
+            GetGame().GetPlayers( players );
+
+            GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, 100, true );
         }
     }
 
@@ -75,63 +83,38 @@ class PermissionsFramework
 
     }
 
-    void ReloadPlayerData()
+    void UpdateSpecificPlayer( PlayerBase player )
     {
-        ref array< Man > players = new ref array< Man >;
-        
-        GetGame().GetPlayers( players );
+        ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( player.GetIdentity() );
 
-        for ( int j = 0; j < players.Count(); j++ )
+        if ( player )
         {
-            Man man = players[j];
-            PlayerBase player = PlayerBase.Cast( man );
-
-            ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( man.GetIdentity() );
-
-            if ( player )
-            {
-                player.authenticatedPlayer = auPlayer;
-            }
-
-            auPlayer.PlayerObject = player;
-            auPlayer.IdentityPlayer = man.GetIdentity();
-
-            auPlayer.UpdatePlayerData();
-
-            GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayer", new Param3< string, string, string >( auPlayer.GetSteam64ID(), auPlayer.GetName(), auPlayer.GetGUID() ), true, NULL, player );
+            player.authenticatedPlayer = auPlayer;
         }
 
-        delete players;
+        auPlayer.PlayerObject = player;
+        auPlayer.IdentityPlayer = player.GetIdentity();
+
+        GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayer", new Param3< string, string, string >( auPlayer.GetSteam64ID(), auPlayer.GetName(), auPlayer.GetGUID() ), true, NULL, player );
     }
 
     void ReloadPlayerList()
     {
-        ref array< PlayerIdentity > identities = new ref array< PlayerIdentity >;
-        
-        GetGame().GetPlayerIndentities( identities );
+        int i = m_Index;
 
-        for ( int i = 0; i < GetPermissionsManager().AuthPlayers.Count(); i++ )
+        for ( int j = 0; j < m_UpdateMax; j++ )
         {
-            ref AuthPlayer ap = GetPermissionsManager().AuthPlayers[i];
+            i = i + j;
 
-            for ( int j = 0; j < identities.Count(); j++ )
-            {
-                if ( ap.GetGUID() == identities[j].GetId() )
-                {
-                    ap.Save();
+            if ( i >= m_Players.Count() )
+            {   
+                i = 0;
 
-                    GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( ap ) ), true );
-
-                    GetPermissionsManager().AuthPlayers.Remove( i );
-
-                    i = i - 1;
-                }
+                GetGame().GetPlayers( m_Players );
             }
+
+            UpdateSpecificPlayer( PlayerBase.Cast( m_Players[i] ) );
         }
-
-        delete identities;
-
-        GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerData, 200, false );
     }
 
     void CheckVersion( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
@@ -210,6 +193,8 @@ class PermissionsFramework
             {
                 ref AuthPlayer player = GetPermissionsManager().GetPlayerByGUID( data.param1 );
                 if ( !player ) return;
+
+                player.UpdatePlayerData();
 
                 GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayerData", new Param1< ref PlayerData >( SerializePlayer( player ) ), true, sender, player.PlayerObject );
             }
