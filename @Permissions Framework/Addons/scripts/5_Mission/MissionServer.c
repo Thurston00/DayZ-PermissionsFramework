@@ -73,12 +73,16 @@ modded class MissionServer
 	{
         super.InvokeOnConnect( player, identity );
 
+        GetPermissionsManager().GetPlayerByIdentity( identity );
+
         SetClientPermissionsOnConnection( identity, player );
     } 
 
 	override void OnClientReconnectEvent( PlayerIdentity identity, PlayerBase player )
 	{
         super.OnClientReconnectEvent( identity, player );
+        
+        GetPermissionsManager().GetPlayerByIdentity( identity );
         
         SetClientPermissionsOnConnection( identity, player );
     }

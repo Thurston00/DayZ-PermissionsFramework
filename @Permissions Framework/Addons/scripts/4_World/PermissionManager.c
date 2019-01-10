@@ -210,6 +210,47 @@ class PermissionManager
         }
     }
 
+    ref AuthPlayer UpdateAuthPlayer( MinifiedPlayerData minied )
+    {
+        Print( minied.SteamID + " " + minied );
+
+        ref AuthPlayer auPlayer = NULL;
+
+        for ( int i = 0; i < AuthPlayers.Count(); i++ )
+        {
+            if ( AuthPlayers[i].GetGUID() == minied.GUID )
+            {
+                auPlayer = AuthPlayers[i];
+                
+                auPlayer.Data.SName = minied.Name;
+                auPlayer.Data.SGUID = minied.GUID; 
+                auPlayer.Data.SSteam64ID = minied.SteamID; 
+                auPlayer.Data.VPosition = minied.Position; 
+                auPlayer.PlayerObject = minied.Obj;
+
+                break;
+            }
+        }
+
+        if ( auPlayer == NULL )
+        {
+            ref PlayerData data = new ref PlayerData;
+                        
+            data.SName = minied.Name;
+            data.SGUID = minied.GUID; 
+            data.SSteam64ID = minied.SteamID; 
+            data.VPosition = minied.Position; 
+                    
+            auPlayer = new ref AuthPlayer( data );
+
+            auPlayer.PlayerObject = minied.Obj;
+
+            AuthPlayers.Insert( auPlayer );
+        }
+
+        return auPlayer;
+    }
+
     ref AuthPlayer GetPlayerByGUID( string guid )
     {
         ref AuthPlayer auPlayer = NULL;
