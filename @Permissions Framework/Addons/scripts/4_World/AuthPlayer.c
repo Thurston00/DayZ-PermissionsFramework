@@ -64,6 +64,20 @@ class AuthPlayer
         return Data.SName;
     }
 
+    ref MinifiedPlayerData GenerateMinifiedData()
+    {
+        ref MinifiedPlayerData data = new ref MinifiedPlayerData;
+
+        data.Name = Data.SName;
+        data.SteamID = Data.SSteam64ID;
+        data.GUID = Data.SGUID;
+        data.Position = Data.VPosition;
+
+        data.Obj = PlayerObject;
+
+        return data;
+    }          
+
     void UpdatePlayerData()
     {
         if ( IdentityPlayer == NULL ) return;

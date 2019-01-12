@@ -12,7 +12,7 @@ class PermissionsFramework
 
     protected ref array< Man > m_Players;
 
-    protected ref array< MinifiedPlayerData > m_PlayerListData;
+    protected ref array< ref MinifiedPlayerData > m_PlayerListData;
 
     void PermissionsFramework()
     {
@@ -23,7 +23,7 @@ class PermissionsFramework
 
         m_bLoaded = false;
         m_Players = new ref array< Man >;
-        m_PlayerListData = new ref array< MinifiedPlayerData >;
+        m_PlayerListData = new ref array< ref MinifiedPlayerData >;
 
         GetRPCManager().AddRPC( "PermissionsFramework", "RemovePlayer", this, SingeplayerExecutionType.Client );
         GetRPCManager().AddRPC( "PermissionsFramework", "UpdatePlayers", this, SingeplayerExecutionType.Client );
@@ -89,31 +89,9 @@ class PermissionsFramework
 
     }
 
-    ref AuthPlayer UpdateSpecificPlayer( PlayerBase player )
-    {
-        ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( player.GetIdentity() );
-
-        if ( player )
-        {
-            player.authenticatedPlayer = auPlayer;
-        }
-
-        if ( auPlayer )
-        {
-            auPlayer.UpdatePlayerData();
-
-            auPlayer.PlayerObject = player;
-            auPlayer.IdentityPlayer = player.GetIdentity();
-
-            return auPlayer;
-        }
-
-        return NULL;
-    }
-
     void ReloadPlayerList()
     {
-        int i = m_Index;
+        Print("--- Start of ReloadPlayerList ---");
 
         if ( m_Players == NULL )
             return;
@@ -126,39 +104,50 @@ class PermissionsFramework
 
         for ( int j = 0; j < m_UpdateMax; j++ )
         {
-            i = i + j;
+            m_Index = m_Index + j;
             
-            if ( i >= m_Players.Count() || i < 0 )
+            if ( m_Index >= m_Players.Count() || m_Index < 0 )
             {   
                 if ( m_PlayerListData.Count() > 0 )
                 {
-                    GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param1< ref array< MinifiedPlayerData > >( m_PlayerListData ), true, NULL );
+                    Print( "--- Start of Full ReloadPlayerList ---" );
+                    Print( m_PlayerListData.Count() );
+                    for ( int k = 0; k < m_PlayerListData.Count(); k++ )
+                    {
+                        Print( m_PlayerListData[k] );
+                    }
+                    Print( "--- End of Full ReloadPlayerList ---" );
+
+                    GetRPCManager().SendRPC( "PermissionsFramework", "UpdatePlayers", new Param1< ref array< ref MinifiedPlayerData > >( m_PlayerListData ), true, NULL );
                     m_ClearNext = true;
                 }
                 
-                i = 0;
+                m_Index = 0;
 
                 GetGame().GetPlayers( m_Players );
 
                 return;
             }
 
-            ref AuthPlayer player = UpdateSpecificPlayer( PlayerBase.Cast( m_Players[i] ) );
+            ref AuthPlayer auPlayer = GetPermissionsManager().GetPlayerByIdentity( player.GetIdentity() );
 
             if ( player )
             {
-                ref MinifiedPlayerData data = new ref MinifiedPlayerData;
+                player.authenticatedPlayer = auPlayer;
+            }
 
-                data.Name = player.GetName();
-                data.SteamID = player.GetSteam64ID();
-                data.GUID = player.GetGUID();
-                data.Position = player.Data.VPosition;
+            Print( player );
 
-                data.Obj = player.PlayerObject;
+            if ( auPlayer != NULL )
+            {
+                auPlayer.UpdatePlayerData();
 
-                m_PlayerListData.Insert( data );
+                auPlayer.PlayerObject = player;
+
+                m_PlayerListData.Insert( auPlayer.GenerateMinifiedData() );
             }
         }
+        Print("--- End of ReloadPlayerList ---");
     }
 
     void CheckVersion( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
@@ -213,10 +202,13 @@ class PermissionsFramework
             {
                 Print("--- Start of UpdatePlayers ---");
 
-                ref Param1< ref array< MinifiedPlayerData > > data;
+                ref Param1< ref array< ref MinifiedPlayerData > > data;
                 if ( !ctx.Read( data ) ) return;
 
-                m_PlayerListData.Copy( data.param1 );
+                m_PlayerListData = data.param1;
+
+                Print( m_PlayerListData );
+                Print( m_PlayerListData.Count() );
 
                 for ( int i = 0; i < m_PlayerListData.Count(); i++ )
                 {
