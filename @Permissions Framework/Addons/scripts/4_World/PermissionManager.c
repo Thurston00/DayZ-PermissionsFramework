@@ -39,13 +39,33 @@ class PermissionManager
 */
     }
 
-    array< ref AuthPlayer > GetPlayers( ref array< string > steamIds = NULL )
+    int Count()
     {
-        if ( steamIds == NULL )
-        {
-            return AuthPlayers;
-        }
+        return AuthPlayers.Count();
+    }
 
+    ref AuthPlayer Get( int index )
+    {
+        return AuthPlayers[index];
+    }
+
+    int Insert( ref AuthPlayer player )
+    {
+        return AuthPlayers.Insert( player );
+    }
+
+    void Clear()
+    {
+        AuthPlayers.Clear();
+    }
+
+    array< ref AuthPlayer > GetPlayers()
+    {
+        return AuthPlayers;
+    }
+
+    array< ref AuthPlayer > GetFromSteamIDs( ref array< string > steamIds = NULL )
+    {
         array< ref AuthPlayer > tempArray = new array< ref AuthPlayer >;
 
         for ( int i = 0; i < steamIds.Count(); i++ )
@@ -53,6 +73,24 @@ class PermissionManager
             for ( int k = 0; k < AuthPlayers.Count(); k++ )
             {
                 if ( steamIds[i] == AuthPlayers[k].GetSteam64ID() )
+                {
+                    tempArray.Insert( AuthPlayers[k] );
+                }
+            }
+        }
+
+        return tempArray;
+    }
+
+    array< ref AuthPlayer > GetFromGUIDs( ref array< string > guids = NULL )
+    {
+        array< ref AuthPlayer > tempArray = new array< ref AuthPlayer >;
+
+        for ( int i = 0; i < guids.Count(); i++ )
+        {
+            for ( int k = 0; k < AuthPlayers.Count(); k++ )
+            {
+                if ( guids[i] == AuthPlayers[k].GetGUID() )
                 {
                     tempArray.Insert( AuthPlayers[k] );
                 }
@@ -175,7 +213,7 @@ class PermissionManager
             {
                 auPlayer.Save();
 
-                GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
+                // GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
 
                 AuthPlayers.Remove( i );
                 break;
@@ -193,7 +231,7 @@ class PermissionManager
             {
                 auPlayer.Save();
 
-                GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
+                // GetRPCManager().SendRPC( "PermissionsFramework", "RemovePlayer", new Param1< ref PlayerData >( SerializePlayer( auPlayer ) ), true );
 
                 AuthPlayers.Remove( i );
                 break;
