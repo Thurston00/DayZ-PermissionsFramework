@@ -240,7 +240,6 @@ class PermissionsFramework
         GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).CallLater( this.ReloadPlayerList, timeBetween, false );
     }
 
-
     void CheckVersion( CallType type, ref ParamsReadContext ctx, ref PlayerIdentity sender, ref Object target )
     {
         Param3< int, int, int > data;

@@ -71,10 +71,11 @@ int AddSelectedPlayer( ref AuthPlayer player )
     if ( posPlayer > -1 )
         return posPlayer;
 
-    if ( posGUID > -1 )
-        GetSelectedGUIDs().Remove( posGUID );
+    if ( posGUID == -1 )
+    {
+        posGUID = GetSelectedGUIDs().Insert( player.GetGUID() );
+    }
     
-    posGUID = GetSelectedGUIDs().Insert( player.GetGUID() );
     posPlayer = GetSelectedPlayers().Insert( player );
 
     return posPlayer;
